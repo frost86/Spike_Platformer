@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight Jump</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <div id="ui-layer">
+            <div class="top-bar">
+                <div class="stats-left">
+                    <div class="lives-container" id="lives-display">
+                        <!-- Hearts will be injected here -->
+                    </div>
+                    <div class="hits-container">
+                        <div class="health-bar-bg">
+                            <div class="health-bar-fill" id="health-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-right">
+                    <div class="stars-container">
+                        <span class="star-icon">★</span>
+                        <span id="star-count">0 / 0</span>
+                    </div>
+                    <div class="level-container">
+                        Level <span id="level-display">1</span>
+                    </div>
+                </div>
+            </div>
+            <div id="game-over-screen" class="hidden">
+                <h1 id="game-over-title">GAME OVER</h1>
+                <p id="game-over-message">You have run out of lives.</p>
+                <button id="restart-btn">PLAY AGAIN</button>
+            </div>
+        </div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

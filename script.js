@@ -459,18 +459,22 @@ addTouchControls(btnRight, 'ArrowRight');
 
 // Global tap to jump
 document.addEventListener('touchstart', (e) => {
-    if (e.target.closest('button')) return; // ignore if tapping a button
+    if (e.target && e.target.closest && e.target.closest('button')) return; // ignore if tapping a button
     e.preventDefault();
+    if (player.isGrounded) {
+        player.vy = player.jumpForce;
+        player.isGrounded = false;
+    }
     keys['ArrowUp'] = true;
 }, { passive: false });
 
 document.addEventListener('touchend', (e) => {
-    if (e.target.closest('button')) return;
+    if (e.target && e.target.closest && e.target.closest('button')) return;
     e.preventDefault();
     keys['ArrowUp'] = false;
 }, { passive: false });
 
 document.addEventListener('touchcancel', (e) => {
-    if (e.target.closest('button')) return;
+    if (e.target && e.target.closest && e.target.closest('button')) return;
     keys['ArrowUp'] = false;
 }, { passive: false });

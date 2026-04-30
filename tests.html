@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spike Platformer Unit Tests</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .pass { color: green; font-weight: bold; }
+        .fail { color: red; font-weight: bold; }
+        #game-container { display: none; /* Hide the game elements during tests */ }
+    </style>
+</head>
+<body>
+    <h1>Unit Tests Results</h1>
+    <div id="results"></div>
+
+    <!-- Hidden game elements required by script.js -->
+    <div id="game-container">
+        <span id="star-count"></span>
+        <span id="level-display"></span>
+        <div id="health-bar"></div>
+        <div id="lives-display"></div>
+        <div id="game-over-screen" class="hidden"></div>
+        <button id="restart-btn"></button>
+        <button id="btn-left"></button>
+        <button id="btn-right"></button>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+    </div>
+    
+    <script src="script.js"></script>
+    <script>
+        const resultsDiv = document.getElementById('results');
+
+        function assert(condition, message) {
+            const p = document.createElement('p');
+            p.textContent = (condition ? '✅ PASS: ' : '❌ FAIL: ') + message;
+            p.className = condition ? 'pass' : 'fail';
+            resultsDiv.appendChild(p);
+            if (!condition) console.error("Test failed: " + message);
+        }
+
+        console.log("Running unit tests...");
+
+        try {
+            // Test 1: Player initialization
+            assert(lives === 3, 'Player starts with 3 lives');
+            
+            // Test 2: circleRectCollide function
+            assert(circleRectCollide(10, 10, 5, 0, 0, 20, 20) === true, 'Circle inside rect is a collision');
+            assert(circleRectCollide(30, 30, 5, 0, 0, 20, 20) === false, 'Circle outside rect is not a collision');
+            
+            // Test 3: getOverlap function
+            let r1 = {x: 0, y: 0, width: 10, height: 10};
+            let r2 = {x: 5, y: 5, w: 10, h: 10};
+            assert(getOverlap(r1, r2) === true, 'Overlapping rectangles return true');
+            
+            let r3 = {x: 20, y: 20, w: 10, h: 10};
+            assert(getOverlap(r1, r3) === false, 'Non-overlapping rectangles return false');
+            
+            // Test 4: takeDamage decreases hits
+            let initialHits = hits;
+            takeDamage();
+            assert(hits === initialHits - 1, 'takeDamage decreases hits by 1');
+            
+            // Test 5: Initial level generation 
+            assert(platforms.length > 0, 'Platforms are generated on start');
+            assert(starsTotal > 0, 'Stars are generated on start');
+            
+        } catch(e) {
+            assert(false, "Tests threw an exception: " + e.message);
+        }
+    </script>
+</body>
+</html>

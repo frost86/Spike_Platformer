@@ -198,6 +198,8 @@ canvas {
 /* Mobile Controls */
 #mobile-controls {
     display: none;
+    position: absolute;
+    bottom: 20px;
     width: 100%;
     max-width: 800px;
     padding: 10px 20px;
@@ -209,6 +211,7 @@ canvas {
 @media (hover: none) and (pointer: coarse) {
     #game-container {
         max-height: calc(100vh - 100px);
+        margin-bottom: 80px; /* leaves room for the absolutely positioned controls */
     }
     
     #mobile-controls {

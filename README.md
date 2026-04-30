@@ -13,9 +13,14 @@ Starlight Jump is an endless, procedurally generated 2D platformer built with HT
 ## How to Play
 
 ### Controls
+**Desktop:**
 - **Move Left:** `Arrow Left` or `A`
 - **Move Right:** `Arrow Right` or `D`
 - **Jump:** `Arrow Up`, `W`, or `Spacebar`
+
+**Mobile / Touch:**
+- **Move:** Touch anywhere on the screen and drag left or right. The game features a dynamic floating joystick that responds to the direction of your thumb.
+- **Jump:** Quickly swipe upwards anywhere on the screen.
 
 ### Objective
 Collect all the golden stars in the level to advance to the next stage. Avoid the red spike balls, or you will take damage. Lose all 3 lives, and it's game over!

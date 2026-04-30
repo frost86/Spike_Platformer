@@ -426,15 +426,15 @@ document.getElementById('restart-btn').addEventListener('click', () => {
 generateLevel();
 requestAnimationFrame(gameLoop);
 
-// Touch Controls (Split-Screen & Swipe to Jump)
+// Touch Controls (Floating Joystick & Swipe to Jump)
 const activeTouches = {};
 
 function updateMovementKeys() {
     keys['ArrowLeft'] = false;
     keys['ArrowRight'] = false;
     for (let id in activeTouches) {
-        if (activeTouches[id].side === 'left') keys['ArrowLeft'] = true;
-        if (activeTouches[id].side === 'right') keys['ArrowRight'] = true;
+        if (activeTouches[id].direction === 'left') keys['ArrowLeft'] = true;
+        if (activeTouches[id].direction === 'right') keys['ArrowRight'] = true;
     }
 }
 
@@ -444,11 +444,10 @@ document.addEventListener('touchstart', (e) => {
     
     for (let i = 0; i < e.changedTouches.length; i++) {
         let t = e.changedTouches[i];
-        let side = t.clientX < window.innerWidth / 2 ? 'left' : 'right';
         activeTouches[t.identifier] = {
-            startX: t.clientX,
+            anchorX: t.clientX,
             startY: t.clientY,
-            side: side,
+            direction: null,
             hasJumped: false
         };
     }
@@ -459,11 +458,34 @@ document.addEventListener('touchmove', (e) => {
     if (e.target && e.target.closest && e.target.closest('button')) return;
     e.preventDefault();
     
+    let deadzone = 15;
+    let maxRadius = 40;
+    
     for (let i = 0; i < e.changedTouches.length; i++) {
         let t = e.changedTouches[i];
         let touchData = activeTouches[t.identifier];
         if (touchData) {
-            // Check for swipe up (e.g., moved finger up by more than 30 pixels)
+            // Update anchorX if finger moves too far (dynamic floating joystick)
+            if (t.clientX > touchData.anchorX + maxRadius) {
+                touchData.anchorX = t.clientX - maxRadius;
+            } else if (t.clientX < touchData.anchorX - maxRadius) {
+                touchData.anchorX = t.clientX + maxRadius;
+            }
+            
+            // Determine direction based on anchor offset
+            if (t.clientX > touchData.anchorX + deadzone) {
+                touchData.direction = 'right';
+            } else if (t.clientX < touchData.anchorX - deadzone) {
+                touchData.direction = 'left';
+            } else {
+                touchData.direction = null; // stop moving if within deadzone
+            }
+            
+            // Jump logic: update startY if finger moves down, so you can always swipe up
+            if (t.clientY > touchData.startY) {
+                touchData.startY = t.clientY;
+            }
+            
             if (!touchData.hasJumped && (touchData.startY - t.clientY) > 30) {
                 if (player.isGrounded) {
                     player.vy = player.jumpForce;
@@ -473,6 +495,7 @@ document.addEventListener('touchmove', (e) => {
             }
         }
     }
+    updateMovementKeys();
 }, { passive: false });
 
 document.addEventListener('touchend', (e) => {

@@ -426,55 +426,72 @@ document.getElementById('restart-btn').addEventListener('click', () => {
 generateLevel();
 requestAnimationFrame(gameLoop);
 
-// Touch Controls
-const btnLeft = document.getElementById('btn-left');
-const btnRight = document.getElementById('btn-right');
+// Touch Controls (Split-Screen & Swipe to Jump)
+const activeTouches = {};
 
-const addTouchControls = (btn, key) => {
-    if (!btn) return;
-    
-    btn.addEventListener('contextmenu', e => e.preventDefault());
-    
-    btn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        keys[key] = true;
-    }, { passive: false });
-    
-    btn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        keys[key] = false;
-    }, { passive: false });
-    
-    btn.addEventListener('touchcancel', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        keys[key] = false;
-    }, { passive: false });
-};
-
-addTouchControls(btnLeft, 'ArrowLeft');
-addTouchControls(btnRight, 'ArrowRight');
-
-// Global tap to jump
-document.addEventListener('touchstart', (e) => {
-    if (e.target && e.target.closest && e.target.closest('button')) return; // ignore if tapping a button
-    e.preventDefault();
-    if (player.isGrounded) {
-        player.vy = player.jumpForce;
-        player.isGrounded = false;
+function updateMovementKeys() {
+    keys['ArrowLeft'] = false;
+    keys['ArrowRight'] = false;
+    for (let id in activeTouches) {
+        if (activeTouches[id].side === 'left') keys['ArrowLeft'] = true;
+        if (activeTouches[id].side === 'right') keys['ArrowRight'] = true;
     }
-    keys['ArrowUp'] = true;
+}
+
+document.addEventListener('touchstart', (e) => {
+    if (e.target && e.target.closest && e.target.closest('button')) return; // let buttons work normally
+    e.preventDefault();
+    
+    for (let i = 0; i < e.changedTouches.length; i++) {
+        let t = e.changedTouches[i];
+        let side = t.clientX < window.innerWidth / 2 ? 'left' : 'right';
+        activeTouches[t.identifier] = {
+            startX: t.clientX,
+            startY: t.clientY,
+            side: side,
+            hasJumped: false
+        };
+    }
+    updateMovementKeys();
+}, { passive: false });
+
+document.addEventListener('touchmove', (e) => {
+    if (e.target && e.target.closest && e.target.closest('button')) return;
+    e.preventDefault();
+    
+    for (let i = 0; i < e.changedTouches.length; i++) {
+        let t = e.changedTouches[i];
+        let touchData = activeTouches[t.identifier];
+        if (touchData) {
+            // Check for swipe up (e.g., moved finger up by more than 30 pixels)
+            if (!touchData.hasJumped && (touchData.startY - t.clientY) > 30) {
+                if (player.isGrounded) {
+                    player.vy = player.jumpForce;
+                    player.isGrounded = false;
+                }
+                touchData.hasJumped = true; // Prevent continuous jumps from the same swipe
+            }
+        }
+    }
 }, { passive: false });
 
 document.addEventListener('touchend', (e) => {
     if (e.target && e.target.closest && e.target.closest('button')) return;
     e.preventDefault();
-    keys['ArrowUp'] = false;
+    
+    for (let i = 0; i < e.changedTouches.length; i++) {
+        let t = e.changedTouches[i];
+        delete activeTouches[t.identifier];
+    }
+    updateMovementKeys();
 }, { passive: false });
 
 document.addEventListener('touchcancel', (e) => {
     if (e.target && e.target.closest && e.target.closest('button')) return;
-    keys['ArrowUp'] = false;
+    
+    for (let i = 0; i < e.changedTouches.length; i++) {
+        let t = e.changedTouches[i];
+        delete activeTouches[t.identifier];
+    }
+    updateMovementKeys();
 }, { passive: false });

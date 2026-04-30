@@ -429,7 +429,6 @@ requestAnimationFrame(gameLoop);
 // Touch Controls
 const btnLeft = document.getElementById('btn-left');
 const btnRight = document.getElementById('btn-right');
-const btnJump = document.getElementById('btn-jump');
 
 const addTouchControls = (btn, key) => {
     if (!btn) return;
@@ -438,20 +437,40 @@ const addTouchControls = (btn, key) => {
     
     btn.addEventListener('touchstart', (e) => {
         e.preventDefault();
+        e.stopPropagation();
         keys[key] = true;
     }, { passive: false });
     
     btn.addEventListener('touchend', (e) => {
         e.preventDefault();
+        e.stopPropagation();
         keys[key] = false;
     }, { passive: false });
     
     btn.addEventListener('touchcancel', (e) => {
         e.preventDefault();
+        e.stopPropagation();
         keys[key] = false;
     }, { passive: false });
 };
 
 addTouchControls(btnLeft, 'ArrowLeft');
 addTouchControls(btnRight, 'ArrowRight');
-addTouchControls(btnJump, 'ArrowUp');
+
+// Global tap to jump
+document.addEventListener('touchstart', (e) => {
+    if (e.target.closest('button')) return; // ignore if tapping a button
+    e.preventDefault();
+    keys['ArrowUp'] = true;
+}, { passive: false });
+
+document.addEventListener('touchend', (e) => {
+    if (e.target.closest('button')) return;
+    e.preventDefault();
+    keys['ArrowUp'] = false;
+}, { passive: false });
+
+document.addEventListener('touchcancel', (e) => {
+    if (e.target.closest('button')) return;
+    keys['ArrowUp'] = false;
+}, { passive: false });

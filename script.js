@@ -425,3 +425,33 @@ document.getElementById('restart-btn').addEventListener('click', () => {
 // Start
 generateLevel();
 requestAnimationFrame(gameLoop);
+
+// Touch Controls
+const btnLeft = document.getElementById('btn-left');
+const btnRight = document.getElementById('btn-right');
+const btnJump = document.getElementById('btn-jump');
+
+const addTouchControls = (btn, key) => {
+    if (!btn) return;
+    
+    btn.addEventListener('contextmenu', e => e.preventDefault());
+    
+    btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys[key] = true;
+    }, { passive: false });
+    
+    btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys[key] = false;
+    }, { passive: false });
+    
+    btn.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        keys[key] = false;
+    }, { passive: false });
+};
+
+addTouchControls(btnLeft, 'ArrowLeft');
+addTouchControls(btnRight, 'ArrowRight');
+addTouchControls(btnJump, 'ArrowUp');

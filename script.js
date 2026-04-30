@@ -446,6 +446,7 @@ document.addEventListener('touchstart', (e) => {
         let t = e.changedTouches[i];
         activeTouches[t.identifier] = {
             anchorX: t.clientX,
+            lastX: t.clientX, // Track for immediate direction changes
             startY: t.clientY,
             direction: null,
             hasJumped: false
@@ -465,6 +466,16 @@ document.addEventListener('touchmove', (e) => {
         let t = e.changedTouches[i];
         let touchData = activeTouches[t.identifier];
         if (touchData) {
+            let deltaX = t.clientX - touchData.lastX;
+            touchData.lastX = t.clientX;
+            
+            // Instantly snap the anchor if the user reverses their finger direction
+            if (deltaX < -3 && touchData.direction !== 'left') {
+                touchData.anchorX = t.clientX + deadzone + 1;
+            } else if (deltaX > 3 && touchData.direction !== 'right') {
+                touchData.anchorX = t.clientX - deadzone - 1;
+            }
+            
             // Update anchorX if finger moves too far (dynamic floating joystick)
             if (t.clientX > touchData.anchorX + maxRadius) {
                 touchData.anchorX = t.clientX - maxRadius;
